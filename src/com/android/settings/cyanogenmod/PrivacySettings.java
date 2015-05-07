@@ -42,10 +42,23 @@ public class PrivacySettings extends SettingsPreferenceFragment {
         mBlacklist = (PreferenceScreen) findPreference(KEY_BLACKLIST);
 
         // Determine options based on device telephony support
-        if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+        if (getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            // WhisperPush
+            // Only add if device has telephony support and has WhisperPush installed.
+            if (Utils.isPackageInstalled(getActivity(), "org.whispersystems.whisperpush")) {
+                addPreferencesFromResource(R.xml.security_settings_whisperpush);
+            }
+        } else {
             // No telephony, remove dependent options
             getPreferenceScreen().removePreference(mBlacklist);
             mBlacklist = null;
+        }
+
+        addPreferencesFromResource(R.xml.security_settings_cyanogenmod);
+        // Logger
+        // Only add if device has Logger installed
+        if (Utils.isPackageInstalled(getActivity(), "com.cyngn.logger")) {
+            addPreferencesFromResource(R.xml.security_settings_logger);
         }
     }
 
