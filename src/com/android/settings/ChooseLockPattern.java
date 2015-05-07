@@ -102,7 +102,6 @@ public class ChooseLockPattern extends PreferenceActivity {
         private static final int WRONG_PATTERN_CLEAR_TIMEOUT_MS = 2000;
 
         private static final int ID_EMPTY_MESSAGE = -1;
-        private static final String KEY_PATTERN_SIZE = "pattern_size";
 
         protected TextView mHeaderText;
         protected LockPatternView mLockPatternView;
@@ -314,22 +313,8 @@ public class ChooseLockPattern extends PreferenceActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
 
-            // setupViews()
-            View view = inflater.inflate(R.layout.choose_lock_pattern, null);
-            mHeaderText = (TextView) view.findViewById(R.id.headerText);
-            mLockPatternView = (LockPatternView) view.findViewById(R.id.lockPattern);
-            mLockPatternView.setOnPatternListener(mChooseNewLockPatternListener);
-            mLockPatternView.setTactileFeedbackEnabled(
-                    mChooseLockSettingsHelper.utils().isTactileFeedbackEnabled());
-            mLockPatternView.setLockPatternUtils(mChooseLockSettingsHelper.utils());
-
-            if ( savedInstanceState == null ) {
-                mPatternSize = getActivity().getIntent().getByteExtra(KEY_PATTERN_SIZE,
-                        LockPatternUtils.PATTERN_SIZE_DEFAULT);
-            } else {
-                mPatternSize = savedInstanceState.getByte(KEY_PATTERN_SIZE);
-            }
-            mLockPatternView.setLockPatternSize(mPatternSize);
+            mPatternSize = getActivity().getIntent().getByteExtra("pattern_size",
+                    LockPatternUtils.PATTERN_SIZE_DEFAULT);
             LockPatternView.Cell.updateSize(mPatternSize);
             mAnimatePattern = Collections.unmodifiableList(Lists.newArrayList(
                     LockPatternView.Cell.of(0, 0, mPatternSize),
@@ -337,6 +322,16 @@ public class ChooseLockPattern extends PreferenceActivity {
                     LockPatternView.Cell.of(1, 1, mPatternSize),
                     LockPatternView.Cell.of(2, 1, mPatternSize)
                     ));
+
+            // setupViews()
+            View view = inflater.inflate(R.layout.choose_lock_pattern, null);
+            mHeaderText = (TextView) view.findViewById(R.id.headerText);
+            mLockPatternView = (LockPatternView) view.findViewById(R.id.lockPattern);
+            mLockPatternView.setOnPatternListener(mChooseNewLockPatternListener);
+            mLockPatternView.setTactileFeedbackEnabled(
+                    mChooseLockSettingsHelper.utils().isTactileFeedbackEnabled());
+            mLockPatternView.setLockPatternSize(mPatternSize);
+            mLockPatternView.setLockPatternUtils(mChooseLockSettingsHelper.utils());
 
             mFooterText = (TextView) view.findViewById(R.id.footerText);
 
@@ -375,7 +370,7 @@ public class ChooseLockPattern extends PreferenceActivity {
                 final String patternString = savedInstanceState.getString(KEY_PATTERN_CHOICE);
                 if (patternString != null) {
                     LockPatternUtils utils = mChooseLockSettingsHelper.utils();
-                    mChosenPattern = utils.stringToPattern(patternString, mPatternSize);
+                    mChosenPattern = utils.stringToPattern(patternString);
                 }
                 updateStage(Stage.values()[savedInstanceState.getInt(KEY_UI_STAGE)]);
             }
@@ -440,12 +435,10 @@ public class ChooseLockPattern extends PreferenceActivity {
             super.onSaveInstanceState(outState);
 
             outState.putInt(KEY_UI_STAGE, mUiStage.ordinal());
-            outState.putByte(KEY_PATTERN_SIZE, mPatternSize);
             if (mChosenPattern != null) {
                 LockPatternUtils utils = mChooseLockSettingsHelper.utils();
                 outState.putString(KEY_PATTERN_CHOICE,
-                        utils.patternToString(
-                                mChosenPattern, ((byte)mLockPatternView.getLockPatternSize())));
+                        utils.patternToString(mChosenPattern));
             }
         }
 

@@ -4,8 +4,7 @@
     xmlns:prvandroid="http://schemas.android.com/apk/prv/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/lock_targets_background">
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
